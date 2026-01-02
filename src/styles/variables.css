@@ -1,0 +1,15 @@
+/* Focus Session Variables */
+.focus-session-view {
+	/* Map Obsidian theme variables to our local variables for easier usage/overrides */
+	--fs-bg: var(--background-secondary);
+	--fs-text-primary: var(--text-normal);
+	--fs-text-secondary: var(--text-muted);
+	--fs-accent: var(--interactive-accent);
+	--fs-accent-glow: var(--interactive-accent);
+	/* Simplified glow to just use accent color */
+	--fs-card-bg: var(--background-primary);
+	--fs-border: var(--background-modifier-border);
+
+	/* Use Obsidian's interactive hover colors */
+	--fs-hover-bg: var(--background-modifier-hover);
+}

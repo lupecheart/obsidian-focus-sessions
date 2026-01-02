@@ -1,5 +1,6 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
-import { SessionManager } from "./session-manager";
+import { SessionManager } from "./services/session-manager";
+import { formatDuration, getRemainingTime } from "./utils/time-utils";
 import { FOCUS_SESSION_VIEW_TYPE, FocusSessionView } from "./ui/focus-session-view";
 import { SessionModal } from "./ui/session-modal";
 
@@ -44,14 +45,8 @@ export default class FocusSessionsPlugin extends Plugin {
 	updateStatusBar() {
 		const session = this.sessionManager.getActiveSession();
 		if (session) {
-			const now = Date.now();
-			const elapsedSec = Math.floor((now - session.startTime) / 1000);
-			const totalSec = session.durationMinutes * 60;
-			const remainingSec = Math.max(0, totalSec - elapsedSec);
-
-			const m = Math.floor(remainingSec / 60);
-			const s = remainingSec % 60;
-			const timeString = `${m}:${s.toString().padStart(2, "0")}`;
+			const remainingSec = getRemainingTime(session.startTime, session.durationMinutes);
+			const timeString = formatDuration(remainingSec);
 
 			this.statusBarItemEl.setText(`${session.name} (${timeString})`);
 		} else {

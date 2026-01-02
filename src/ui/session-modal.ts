@@ -1,5 +1,6 @@
 import { App, Modal, ButtonComponent } from "obsidian";
-import { SessionManager } from "../session-manager";
+import { SessionManager } from "../services/session-manager";
+import { getRemainingTime } from "../utils/time-utils";
 
 export class SessionModal extends Modal {
 	private sessionManager: SessionManager;
@@ -19,12 +20,12 @@ export class SessionModal extends Modal {
 			contentEl.createEl("h2", { text: session.name });
 
 			// We could add a live timer here in the future
-			const elapsed = Math.floor((Date.now() - session.startTime) / 60000);
 			const total = session.durationMinutes;
-			const remaining = Math.max(0, total - elapsed);
+			const remainingSec = getRemainingTime(session.startTime, session.durationMinutes);
+			const remainingMin = Math.ceil(remainingSec / 60);
 
 			contentEl.createEl("p", { text: `Duration: ${total} minutes` });
-			contentEl.createEl("p", { text: `Time remaining: ~${remaining} minutes` });
+			contentEl.createEl("p", { text: `Time remaining: ~${remainingMin} minutes` });
 
 			new ButtonComponent(contentEl)
 				.setButtonText("Stop session")

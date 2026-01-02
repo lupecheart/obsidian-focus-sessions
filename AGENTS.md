@@ -92,11 +92,26 @@ This project uses **Semantic Release** to automate versioning and publishing.
 
 - **Strict TypeScript**: The project is set to `"strict": true`. Avoid `any`.
 - **Modularity**:
+    - **UI Separation**: Keep `src/ui/` strictly for views, modals, and display logic.
+    - **Business Logic**: Use `src/services/` for state management and core business logic.
+    - **Utilities**: specific pure functions and helpers go in `src/utils/`.
+    - **Commands**: Command implementations in `src/commands/`.
     - Keep `main.ts` minimal (lifecycle only).
-    - Put logic in `utils/` or `commands/`.
-    - Put UI components in `ui/`.
 - **Async/Await**: Prefer `async/await` over promise chains.
-- **Imports**: Use relative imports suitable for the bundled environment.
+- Imports: Use relative imports suitable for the bundled environment.
+
+### CSS Architecture
+
+- **Modular Styles**:
+    - **Source**: All CSS source files reside in `src/styles/`.
+    - **Build**: `esbuild` bundles these into the final `styles.css`. **Do not edit `styles.css` directly.**
+- **Structure**:
+    - `variables.css`: Global CSS variables (colors, spacing) mapped from Obsidian themes.
+    - `main.css`: The entry point that imports all other CSS files.
+    - Component-specific files (e.g., `focus-session-view.css`) for isolated styles.
+- **Conventions**:
+    - Use kebab-case for file names (e.g., `my-view.css`).
+    - Scope styles with specific class names to avoid global conflicts (e.g., `.my-view-container .element`).
 
 ## Manifest Rules (`manifest.json`)
 

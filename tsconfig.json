@@ -17,7 +17,7 @@
 		"strictBindCallApply": true,
 		"allowSyntheticDefaultImports": true,
 		"useUnknownInCatchVariables": true,
-		"lib": ["ES7"],
+		"lib": ["ES7", "DOM"],
 		"paths": {
 			"@/*": ["*"]
 		}
