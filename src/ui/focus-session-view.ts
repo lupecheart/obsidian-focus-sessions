@@ -7,10 +7,12 @@ export const FOCUS_SESSION_VIEW_TYPE = "focus-session-view";
 export class FocusSessionView extends ItemView {
 	private sessionManager: SessionManager;
 	private container: HTMLElement;
+	private pluginVersion: string;
 
-	constructor(leaf: WorkspaceLeaf, sessionManager: SessionManager) {
+	constructor(leaf: WorkspaceLeaf, sessionManager: SessionManager, pluginVersion: string) {
 		super(leaf);
 		this.sessionManager = sessionManager;
+		this.pluginVersion = pluginVersion;
 	}
 
 	getViewType() {
@@ -52,7 +54,7 @@ export class FocusSessionView extends ItemView {
 		// --- Header ---
 		const header = this.container.createDiv({ cls: "fs-header" });
 		const titleGroup = header.createDiv({ cls: "fs-title-group" });
-		const statusDot = titleGroup.createSpan({ cls: "fs-status-dot" });
+		// const statusDot = titleGroup.createSpan({ cls: "fs-status-dot" });
 		titleGroup.createSpan({ text: "FOCUS SESSION", cls: "fs-title" });
 
 		// const settingsBtn = header.createDiv({ cls: "fs-icon-btn" });
@@ -151,7 +153,7 @@ export class FocusSessionView extends ItemView {
 		footerStatus.createSpan({ cls: "fs-status-dot-sm" });
 		footerStatus.createSpan({ text: isRunning ? "RUNNING" : "ON STANDBY" });
 
-		footer.createDiv({ cls: "fs-version", text: "v1.2.0" });
+		footer.createDiv({ cls: "fs-version", text: `v${this.pluginVersion}` });
 	}
 
 	updateTimerDisplay() {

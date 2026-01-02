@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-focus-sessions",
 	"name": "Focus Sessions",
-	"version": "1.1.0",
+	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "A focus session manager for Obsidian.",
 	"author": "PolarCode",

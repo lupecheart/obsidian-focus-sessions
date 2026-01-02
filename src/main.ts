@@ -12,7 +12,10 @@ export default class FocusSessionsPlugin extends Plugin {
 		this.sessionManager = new SessionManager();
 
 		// Register the View
-		this.registerView(FOCUS_SESSION_VIEW_TYPE, (leaf) => new FocusSessionView(leaf, this.sessionManager));
+		this.registerView(
+			FOCUS_SESSION_VIEW_TYPE,
+			(leaf) => new FocusSessionView(leaf, this.sessionManager, this.manifest.version),
+		);
 
 		// Ribbon Icon
 		this.addRibbonIcon("clock", "Open focus sessions", () => {
