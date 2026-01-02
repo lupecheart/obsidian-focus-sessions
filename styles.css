@@ -1,3 +1,4 @@
+/* src/styles/variables.css */
 .focus-session-view {
 	--fs-bg: var(--background-secondary);
 	--fs-text-primary: var(--text-normal);
@@ -8,6 +9,8 @@
 	--fs-border: var(--background-modifier-border);
 	--fs-hover-bg: var(--background-modifier-hover);
 }
+
+/* src/styles/focus-session-view.css */
 .focus-session-view {
 	display: flex;
 	flex-direction: column;
@@ -208,3 +211,29 @@
 	background-color: var(--fs-text-secondary);
 	border-radius: 50%;
 }
+
+/* src/styles/components/running-timer.css */
+.fs-timer-running .fs-timer-circle-progress {
+	filter: drop-shadow(0 0 8px var(--fs-accent-glow));
+	animation: fs-pulse-glow 4s infinite ease-in-out;
+}
+.fs-timer-running .fs-timer-text {
+	color: var(--fs-text-primary);
+	text-shadow: 0 0 12px var(--fs-accent-glow);
+}
+@keyframes fs-pulse-glow {
+	0% {
+		filter: drop-shadow(0 0 6px var(--fs-accent-glow));
+		opacity: 0.85;
+	}
+	50% {
+		filter: drop-shadow(0 0 10px var(--fs-accent-glow));
+		opacity: 1;
+	}
+	100% {
+		filter: drop-shadow(0 0 6px var(--fs-accent-glow));
+		opacity: 0.85;
+	}
+}
+
+/* src/styles/main.css */

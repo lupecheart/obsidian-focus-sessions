@@ -120,9 +120,6 @@
 	stroke: var(--fs-accent);
 	stroke-width: 4;
 	stroke-linecap: round;
-	stroke-dasharray: 251;
-	/* 2 * PI * 40 */
-	stroke-dashoffset: 0;
 	/* Adjust this to animate */
 	/* Using a simpler drop-shadow that works with the variable */
 	filter: drop-shadow(0 0 8px var(--fs-accent-glow));

@@ -1,0 +1,29 @@
+/* Running State */
+.fs-timer-running .fs-timer-circle-progress {
+	filter: drop-shadow(0 0 8px var(--fs-accent-glow));
+	/* Slower, subtler breathing animation */
+	animation: fs-pulse-glow 4s infinite ease-in-out;
+}
+
+.fs-timer-running .fs-timer-text {
+	color: var(--fs-text-primary);
+	/* Static text emphasis, no animation on text */
+	text-shadow: 0 0 12px var(--fs-accent-glow);
+}
+
+@keyframes fs-pulse-glow {
+	0% {
+		filter: drop-shadow(0 0 6px var(--fs-accent-glow));
+		opacity: 0.85;
+	}
+
+	50% {
+		filter: drop-shadow(0 0 10px var(--fs-accent-glow));
+		opacity: 1;
+	}
+
+	100% {
+		filter: drop-shadow(0 0 6px var(--fs-accent-glow));
+		opacity: 0.85;
+	}
+}
