@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-focus-sessions",
+	"name": "Focus Sessions",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "A focus session manager for Obsidian.",
+	"author": "PolarCode",
+	"authorUrl": "",
+	"fundingUrl": "",
 	"isDesktopOnly": false
 }

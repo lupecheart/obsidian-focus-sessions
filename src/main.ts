@@ -1,35 +1,69 @@
-import { Plugin } from "obsidian";
-import { DEFAULT_SETTINGS, TemplatePluginSettings, TemplateSettingTab } from "./settings";
-import { registerAllCommands } from "./commands";
-import { TEMPLATE_VIEW_TYPE, TemplateView } from "./ui/example-view";
-import { WorkspaceLeaf } from "obsidian";
+import { Plugin, WorkspaceLeaf } from "obsidian";
+import { SessionManager } from "./session-manager";
+import { FOCUS_SESSION_VIEW_TYPE, FocusSessionView } from "./ui/focus-session-view";
+import { SessionModal } from "./ui/session-modal";
 
-export default class ObsidianStarterPlugin extends Plugin {
-	settings: TemplatePluginSettings;
+export default class FocusSessionsPlugin extends Plugin {
+	sessionManager: SessionManager;
+	statusBarItemEl: HTMLElement;
 
 	async onload() {
-		await this.loadSettings();
+		this.sessionManager = new SessionManager();
 
-		// Register commands from the commands module
-		registerAllCommands(this);
+		// Register the View
+		this.registerView(FOCUS_SESSION_VIEW_TYPE, (leaf) => new FocusSessionView(leaf, this.sessionManager));
 
-		this.registerView(TEMPLATE_VIEW_TYPE, (leaf) => new TemplateView(leaf));
-
-		this.addRibbonIcon("dice", "Activate template view", () => {
+		// Ribbon Icon
+		this.addRibbonIcon("clock", "Open focus sessions", () => {
 			void this.activateView();
 		});
 
-		// Add settings tab
-		this.addSettingTab(new TemplateSettingTab(this.app, this));
+		// Status Bar
+		this.statusBarItemEl = this.addStatusBarItem();
+		this.updateStatusBar();
+
+		// Update status bar on session change
+		this.sessionManager.onChange(() => {
+			this.updateStatusBar();
+		});
+
+		// Periodic update for timer in status bar
+		this.registerInterval(setInterval(() => this.updateStatusBar(), 1000) as unknown as number);
+
+		// Click on status bar to open modal
+		this.statusBarItemEl.addClass("mod-clickable");
+		this.statusBarItemEl.onClickEvent(() => {
+			new SessionModal(this.app, this.sessionManager).open();
+		});
 	}
 
-	onunload() {}
+	onunload() {
+		// Clean up is handled by Obsidian primarily
+	}
+
+	updateStatusBar() {
+		const session = this.sessionManager.getActiveSession();
+		if (session) {
+			const now = Date.now();
+			const elapsedSec = Math.floor((now - session.startTime) / 1000);
+			const totalSec = session.durationMinutes * 60;
+			const remainingSec = Math.max(0, totalSec - elapsedSec);
+
+			const m = Math.floor(remainingSec / 60);
+			const s = remainingSec % 60;
+			const timeString = `${m}:${s.toString().padStart(2, "0")}`;
+
+			this.statusBarItemEl.setText(`${session.name} (${timeString})`);
+		} else {
+			this.statusBarItemEl.setText("");
+		}
+	}
 
 	async activateView() {
 		const { workspace } = this.app;
 
 		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(TEMPLATE_VIEW_TYPE);
+		const leaves = workspace.getLeavesOfType(FOCUS_SESSION_VIEW_TYPE);
 
 		if (leaves.length > 0) {
 			// A leaf with our view already exists, use that
@@ -40,25 +74,13 @@ export default class ObsidianStarterPlugin extends Plugin {
 			const rightLeaf = workspace.getRightLeaf(false);
 			if (rightLeaf) {
 				leaf = rightLeaf;
-				await leaf.setViewState({ type: TEMPLATE_VIEW_TYPE, active: true });
-			} else {
-				// If no right leaf exists, create a new leaf in the main workspace
-				leaf = workspace.getLeaf(true);
-				await leaf.setViewState({ type: TEMPLATE_VIEW_TYPE, active: true });
+				await leaf.setViewState({ type: FOCUS_SESSION_VIEW_TYPE, active: true });
 			}
 		}
 
 		// "Reveal" the leaf in case it is in a collapsed sidebar
 		if (leaf) {
-			await workspace.revealLeaf(leaf);
+			void workspace.revealLeaf(leaf);
 		}
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
