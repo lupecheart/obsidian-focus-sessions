@@ -1,3 +1,11 @@
+# [0.5.0](https://github.com/luispernia/obsidian-focus-sessions/compare/v0.4.0...v0.5.0) (2026-01-03)
+
+### Features
+
+- Introduce editable timer duration with UI controls and dedicated short/long break buttons. ([1aa3694](https://github.com/luispernia/obsidian-focus-sessions/commit/1aa3694d741df1c8f4228981bb1eb58533f59709))
+- Redesign timer input and preset buttons, and hide the SVG timer in idle state. ([c64c3a3](https://github.com/luispernia/obsidian-focus-sessions/commit/c64c3a34c76f39c509e97f80882ae57c6739682c))
+- Rework session controls and idle timer display, adding dynamic buttons, custom duration input, and time presets. ([01e38b4](https://github.com/luispernia/obsidian-focus-sessions/commit/01e38b4580a75b58528c4bd24701aff6f3a801fc))
+
 # [0.4.0](https://github.com/luispernia/obsidian-focus-sessions/compare/v0.3.0...v0.4.0) (2026-01-03)
 
 ### Features

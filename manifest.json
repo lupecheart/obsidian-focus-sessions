@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-focus-sessions",
 	"name": "Focus Sessions",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"minAppVersion": "0.15.0",
 	"description": "A focus session manager for Obsidian.",
 	"author": "Luis Pernia",
