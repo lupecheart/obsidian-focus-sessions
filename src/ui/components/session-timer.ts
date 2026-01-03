@@ -108,30 +108,55 @@ export class SessionTimer {
 			}
 
 			// Enhanced IDLE UI
-			if (!this.timeDisplayEl.querySelector(".fs-timer-adjust")) {
+			if (!this.timeDisplayEl.querySelector(".fs-timer-input")) {
 				this.timeDisplayEl.addClass("fs-timer-editable");
 				this.timeDisplayEl.empty(); // Clear text to rebuild structure
 
-				const minusBtn = this.timeDisplayEl.createSpan({ cls: "fs-timer-adjust fs-adjust-minus" });
-				minusBtn.textContent = "-";
-				minusBtn.onclick = (e) => {
-					e.stopPropagation();
-					this.sessionManager.setCustomDuration(customDuration - 5);
+				// Duration Input
+				const input = this.timeDisplayEl.createEl("input", {
+					type: "number",
+					cls: "fs-timer-input",
+				});
+				input.value = this.sessionManager.getCustomDuration().toString();
+				input.placeholder = "25";
+				input.onchange = () => {
+					const val = parseInt(input.value);
+					if (!isNaN(val) && val > 0) {
+						this.sessionManager.setCustomDuration(val);
+					} else {
+						input.value = this.sessionManager.getCustomDuration().toString();
+					}
 				};
 
-				const timeText = this.timeDisplayEl.createSpan({ cls: "fs-timer-value" });
-				timeText.textContent = displayTime;
+				// Quick Add Presets Container (Below the time, but for now inside the display area or we might need to adjust structure)
+				// The implementation plan suggested "Implement Quick Add Buttons (+30s, +1m, +5m) that appear under the timer."
+				// `timeDisplayEl` is centered in the circle. Let's put them below the input.
 
-				const plusBtn = this.timeDisplayEl.createSpan({ cls: "fs-timer-adjust fs-adjust-plus" });
-				plusBtn.textContent = "+";
-				plusBtn.onclick = (e) => {
-					e.stopPropagation();
-					this.sessionManager.setCustomDuration(customDuration + 5);
-				};
+				const presetContainer = this.timeDisplayEl.createDiv({ cls: "fs-timer-presets" });
+
+				const presets = [
+					{ label: "+30s", val: 0.5 },
+					{ label: "+1m", val: 1 },
+					{ label: "+5m", val: 5 },
+				];
+
+				presets.forEach((p) => {
+					const btn = presetContainer.createEl("button", { cls: "fs-preset-btn", text: p.label });
+					btn.onclick = (e) => {
+						e.stopPropagation();
+						const current = this.sessionManager.getCustomDuration();
+						this.sessionManager.setCustomDuration(current + p.val);
+						input.value = this.sessionManager.getCustomDuration().toString();
+					};
+				});
 			} else {
-				// Update just the text
-				const timeText = this.timeDisplayEl.querySelector(".fs-timer-value");
-				if (timeText) timeText.textContent = displayTime;
+				// Update just the input value if it's not currently focused?
+				// Actually, if user is typing, we shouldn't overwrite unless external change.
+				// For now, let's just make sure it matches if not focused.
+				const input = this.timeDisplayEl.querySelector("input");
+				if (input && document.activeElement !== input) {
+					input.value = this.sessionManager.getCustomDuration().toString();
+				}
 			}
 			// Return early since we handled DOM manually for idle
 			this.labelEl.textContent = labelText;

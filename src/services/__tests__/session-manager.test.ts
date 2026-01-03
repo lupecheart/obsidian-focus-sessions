@@ -92,4 +92,36 @@ describe("SessionManager", () => {
 		sessionManager.pauseSession();
 		expect(listener).toHaveBeenCalledTimes(2);
 	});
+
+	it("should set custom duration", () => {
+		sessionManager.setCustomDuration(50);
+		expect(sessionManager.getCustomDuration()).toBe(50);
+	});
+
+	it("should not set custom duration below 1 minute", () => {
+		sessionManager.setCustomDuration(0);
+		expect(sessionManager.getCustomDuration()).toBe(1); // Min is 1
+		sessionManager.setCustomDuration(-5);
+		expect(sessionManager.getCustomDuration()).toBe(1);
+	});
+
+	it("should start a session with custom duration if no duration is provided", () => {
+		sessionManager.setCustomDuration(40);
+		sessionManager.startSession("Default Focus");
+		const session = sessionManager.getActiveSession();
+
+		expect(session?.durationMinutes).toBe(40);
+	});
+
+	it("should start a Short Break with configured duration if name is 'Short Break'", () => {
+		sessionManager.startSession("Short Break");
+		const session = sessionManager.getActiveSession();
+		expect(session?.durationMinutes).toBe(DEFAULT_SETTINGS.shortBreakDuration);
+	});
+
+	it("should start a Long Break with configured duration if name is 'Long Break'", () => {
+		sessionManager.startSession("Long Break");
+		const session = sessionManager.getActiveSession();
+		expect(session?.durationMinutes).toBe(DEFAULT_SETTINGS.longBreakDuration);
+	});
 });
