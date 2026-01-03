@@ -8,16 +8,21 @@ export interface FocusSession {
 }
 
 import { FocusSessionSettings } from "@/settings";
+import { AudioService } from "@/services/audio-service";
+import { getRemainingTime } from "@/utils/time-utils";
 
 export class SessionManager {
 	private activeSession: FocusSession | null = null;
 	private listeners: (() => void)[] = [];
 	private settings: FocusSessionSettings;
+	private audioService: AudioService;
 
 	private customDuration: number;
 
-	constructor(settings: FocusSessionSettings) {
+	constructor(settings: FocusSessionSettings, audioService: AudioService) {
 		this.settings = settings;
+		this.audioService = audioService;
+		this.audioService.setEnabled(settings.enableSound !== false); // Default true if undefined
 		this.customDuration = settings.focusDuration;
 	}
 
@@ -53,6 +58,7 @@ export class SessionManager {
 			elapsed: 0,
 			lastResumed: now,
 		};
+		this.audioService.playStart();
 		this.notifyListeners();
 	}
 
@@ -62,6 +68,7 @@ export class SessionManager {
 			const elapsedSinceLastResume = Math.floor((now - this.activeSession.lastResumed) / 1000);
 			this.activeSession.elapsed += elapsedSinceLastResume;
 			this.activeSession.status = "paused";
+			this.audioService.playPause();
 			this.notifyListeners();
 		}
 	}
@@ -70,6 +77,7 @@ export class SessionManager {
 		if (this.activeSession && this.activeSession.status === "paused") {
 			this.activeSession.status = "running";
 			this.activeSession.lastResumed = Date.now();
+			this.audioService.playResume();
 			this.notifyListeners();
 		}
 	}
@@ -95,6 +103,27 @@ export class SessionManager {
 			this.activeSession.durationMinutes += minutes;
 			this.notifyListeners();
 		}
+	}
+
+	tick() {
+		if (this.activeSession && this.activeSession.status === "running") {
+			const remaining = getRemainingTime(
+				this.activeSession.durationMinutes,
+				this.activeSession.elapsed,
+				this.activeSession.status,
+				this.activeSession.lastResumed,
+			);
+
+			if (remaining <= 0) {
+				this.completeSession();
+			}
+		}
+	}
+
+	private completeSession() {
+		this.activeSession = null; // Or move to a "completed" state if we had one
+		this.audioService.playComplete();
+		this.notifyListeners();
 	}
 
 	getActiveSession(): FocusSession | null {

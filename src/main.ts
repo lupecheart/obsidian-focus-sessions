@@ -6,16 +6,19 @@ import { SessionModal } from "@/ui/session-modal";
 
 import { FocusSessionSettings, DEFAULT_SETTINGS } from "@/settings";
 import { FocusSessionSettingTab } from "@/ui/settings-tab";
+import { AudioService } from "@/services/audio-service";
 
 export default class FocusSessionsPlugin extends Plugin {
 	sessionManager: SessionManager;
 	statusBarItemEl: HTMLElement;
 	settings: FocusSessionSettings;
+	audioService: AudioService;
 
 	async onload() {
 		await this.loadSettings();
 
-		this.sessionManager = new SessionManager(this.settings);
+		this.audioService = new AudioService(this.settings.enableSound);
+		this.sessionManager = new SessionManager(this.settings, this.audioService);
 
 		// Register the View
 		this.registerView(
@@ -37,8 +40,13 @@ export default class FocusSessionsPlugin extends Plugin {
 			this.updateStatusBar();
 		});
 
-		// Periodic update for timer in status bar
-		this.registerInterval(setInterval(() => this.updateStatusBar(), 1000) as unknown as number);
+		// Periodic update for timer in status bar and session logic
+		this.registerInterval(
+			window.setInterval(() => {
+				this.sessionManager.tick();
+				this.updateStatusBar();
+			}, 1000),
+		);
 
 		// Click on status bar to open modal
 		this.statusBarItemEl.addClass("mod-clickable");
