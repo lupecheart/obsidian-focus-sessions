@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-focus-sessions",
 	"version": "0.2.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "A focus session manager for Obsidian.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
