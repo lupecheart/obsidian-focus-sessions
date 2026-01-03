@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SessionManager } from "../session-manager";
+import { DEFAULT_SETTINGS } from "../../settings";
 
 describe("SessionManager", () => {
 	let sessionManager: SessionManager;
 
 	beforeEach(() => {
 		vi.useFakeTimers();
-		sessionManager = new SessionManager();
+		sessionManager = new SessionManager(DEFAULT_SETTINGS);
 	});
 
 	afterEach(() => {

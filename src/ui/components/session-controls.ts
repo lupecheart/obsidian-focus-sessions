@@ -43,7 +43,7 @@ export class SessionControls {
 					this.sessionManager.resumeSession();
 				}
 			} else {
-				this.sessionManager.startSession("Deep Work", 25);
+				this.sessionManager.startSession("Deep Work");
 			}
 		};
 

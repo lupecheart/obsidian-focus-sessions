@@ -4,12 +4,18 @@ import { formatDuration, getRemainingTime } from "@/utils/time-utils";
 import { FOCUS_SESSION_VIEW_TYPE, FocusSessionView } from "@/ui/focus-session-view";
 import { SessionModal } from "@/ui/session-modal";
 
+import { FocusSessionSettings, DEFAULT_SETTINGS } from "@/settings";
+import { FocusSessionSettingTab } from "@/ui/settings-tab";
+
 export default class FocusSessionsPlugin extends Plugin {
 	sessionManager: SessionManager;
 	statusBarItemEl: HTMLElement;
+	settings: FocusSessionSettings;
 
 	async onload() {
-		this.sessionManager = new SessionManager();
+		await this.loadSettings();
+
+		this.sessionManager = new SessionManager(this.settings);
 
 		// Register the View
 		this.registerView(
@@ -39,6 +45,16 @@ export default class FocusSessionsPlugin extends Plugin {
 		this.statusBarItemEl.onClickEvent(() => {
 			new SessionModal(this.app, this.sessionManager).open();
 		});
+
+		this.addSettingTab(new FocusSessionSettingTab(this.app, this));
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 
 	onunload() {

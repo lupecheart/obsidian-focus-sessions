@@ -7,15 +7,35 @@ export interface FocusSession {
 	lastResumed: number; // timestamp when last resumed/started
 }
 
+import { FocusSessionSettings } from "@/settings";
+
 export class SessionManager {
 	private activeSession: FocusSession | null = null;
 	private listeners: (() => void)[] = [];
+	private settings: FocusSessionSettings;
 
-	startSession(name: string, durationMinutes: number) {
+	constructor(settings: FocusSessionSettings) {
+		this.settings = settings;
+	}
+
+	startSession(name: string, durationMinutes?: number) {
 		const now = Date.now();
+		let duration = durationMinutes;
+
+		if (!duration) {
+			// Determine default duration based on name or default to focus duration
+			if (name === "Short Break") {
+				duration = this.settings.shortBreakDuration;
+			} else if (name === "Long Break") {
+				duration = this.settings.longBreakDuration;
+			} else {
+				duration = this.settings.focusDuration;
+			}
+		}
+
 		this.activeSession = {
 			name,
-			durationMinutes,
+			durationMinutes: duration,
 			startTime: now,
 			status: "running",
 			elapsed: 0,
