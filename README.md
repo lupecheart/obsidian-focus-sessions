@@ -75,6 +75,6 @@ This repository includes an [`AGENTS.md`](./AGENTS.md) file. This file contains 
 
 ## License
 
-Copyright (C) 2026 [Luis Pernia](https://github.com/luispernia)
+Copyright (C) 2026 [Luis Pernia](https://github.com/lupecheart)
 
 [GNU GPLv3](./LICENSE) (or whichever license you prefer)
