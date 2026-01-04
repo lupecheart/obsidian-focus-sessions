@@ -25,7 +25,16 @@ export class SessionFooter {
 
 	update() {
 		if (!this.statusTextRel) return;
-		const isRunning = !!this.sessionManager.getActiveSession();
-		this.statusTextRel.textContent = isRunning ? "RUNNING" : "ON STANDBY";
+
+		const session = this.sessionManager.getActiveSession();
+		const isRunning = session && session.status === "running";
+		const isCompleted = session && session.status === "completed";
+
+		let statusMsg = "ON STANDBY";
+		if (isCompleted) statusMsg = "COMPLETED";
+		else if (isRunning) statusMsg = "RUNNING";
+		else if (session) statusMsg = "PAUSED";
+
+		this.statusTextRel.textContent = statusMsg;
 	}
 }

@@ -3,6 +3,7 @@ import { SessionManager } from "@/services/session-manager";
 import { formatDuration, getRemainingTime } from "@/utils/time-utils";
 import { FOCUS_SESSION_VIEW_TYPE, FocusSessionView } from "@/ui/focus-session-view";
 import { SessionModal } from "@/ui/session-modal";
+import { SessionEndModal } from "@/ui/session-end-modal";
 
 import { FocusSessionSettings, DEFAULT_SETTINGS } from "@/settings";
 import { FocusSessionSettingTab } from "@/ui/settings-tab";
@@ -38,6 +39,11 @@ export default class FocusSessionsPlugin extends Plugin {
 		// Update status bar on session change
 		this.sessionManager.onChange(() => {
 			this.updateStatusBar();
+		});
+
+		// Modal on session completion
+		this.sessionManager.onSessionComplete(() => {
+			new SessionEndModal(this.app, this.sessionManager).open();
 		});
 
 		// Periodic update for timer in status bar and session logic

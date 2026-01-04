@@ -43,12 +43,18 @@ export class SessionControls {
 		const session = this.sessionManager.getActiveSession();
 		const isRunning = session && session.status === "running";
 		const isPaused = session && session.status === "paused";
+		const isCompleted = session && session.status === "completed";
 		const hasSession = isRunning || isPaused;
 
 		// Row 1: Primary Controls
 		const row1 = this.controlsContainer.createDiv({ cls: "fs-controls-row" });
 
-		if (hasSession) {
+		if (isCompleted) {
+			row1.createDiv({ cls: "fs-status-msg", text: "Session Completed" });
+			this.createBtn(row1, "fs-primary", "check", "Finish", () => {
+				this.sessionManager.stopSession();
+			});
+		} else if (hasSession) {
 			// STOP Button (Replacing Reset)
 			// User said: "enter a number when I press reload it should stop"
 			this.createBtn(row1, "fs-secondary", "square", "Stop Session", () => {

@@ -2,7 +2,7 @@ export interface FocusSession {
 	name: string;
 	durationMinutes: number;
 	startTime: number;
-	status: "running" | "paused";
+	status: "running" | "paused" | "completed";
 	elapsed: number; // accumulated time in seconds
 	lastResumed: number; // timestamp when last resumed/started
 }
@@ -14,6 +14,7 @@ import { getRemainingTime } from "@/utils/time-utils";
 export class SessionManager {
 	private activeSession: FocusSession | null = null;
 	private listeners: (() => void)[] = [];
+	private completionListeners: ((session: FocusSession) => void)[] = [];
 	private settings: FocusSessionSettings;
 	private audioService: AudioService;
 
@@ -83,12 +84,14 @@ export class SessionManager {
 	}
 
 	stopSession() {
+		this.audioService.stopAlarm();
 		this.activeSession = null;
 		this.notifyListeners();
 	}
 
 	resetSession() {
 		if (this.activeSession) {
+			this.audioService.stopAlarm();
 			const now = Date.now();
 			this.activeSession.elapsed = 0;
 			this.activeSession.lastResumed = now;
@@ -101,6 +104,14 @@ export class SessionManager {
 	addTime(minutes: number) {
 		if (this.activeSession) {
 			this.activeSession.durationMinutes += minutes;
+
+			// If adding time to a completed session, resume it
+			if (this.activeSession.status === "completed") {
+				this.audioService.stopAlarm();
+				this.activeSession.status = "running";
+				this.activeSession.lastResumed = Date.now();
+			}
+
 			this.notifyListeners();
 		}
 	}
@@ -121,9 +132,12 @@ export class SessionManager {
 	}
 
 	private completeSession() {
-		this.activeSession = null; // Or move to a "completed" state if we had one
-		this.audioService.playComplete();
-		this.notifyListeners();
+		if (this.activeSession) {
+			this.activeSession.status = "completed";
+			this.audioService.playComplete(true); // Loop: true
+			this.notifyListeners();
+			this.notifyCompletion(this.activeSession);
+		}
 	}
 
 	getActiveSession(): FocusSession | null {
@@ -134,11 +148,19 @@ export class SessionManager {
 		this.listeners.push(callback);
 	}
 
+	onSessionComplete(callback: (session: FocusSession) => void) {
+		this.completionListeners.push(callback);
+	}
+
 	removeListener(callback: () => void) {
 		this.listeners = this.listeners.filter((l) => l !== callback);
 	}
 
 	private notifyListeners() {
 		this.listeners.forEach((callback) => callback());
+	}
+
+	private notifyCompletion(session: FocusSession) {
+		this.completionListeners.forEach((callback) => callback(session));
 	}
 }

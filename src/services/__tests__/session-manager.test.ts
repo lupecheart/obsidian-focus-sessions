@@ -1,13 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SessionManager } from "../session-manager";
+import { AudioService } from "../audio-service";
 import { DEFAULT_SETTINGS } from "../../settings";
 
 describe("SessionManager", () => {
 	let sessionManager: SessionManager;
+	let mockAudioService: AudioService;
 
 	beforeEach(() => {
 		vi.useFakeTimers();
-		sessionManager = new SessionManager(DEFAULT_SETTINGS);
+		mockAudioService = {
+			playStart: vi.fn(),
+			playPause: vi.fn(),
+			playResume: vi.fn(),
+			playComplete: vi.fn(),
+			stopAlarm: vi.fn(),
+			setEnabled: vi.fn(),
+		} as unknown as AudioService;
+		sessionManager = new SessionManager(DEFAULT_SETTINGS, mockAudioService);
 	});
 
 	afterEach(() => {
@@ -123,5 +133,16 @@ describe("SessionManager", () => {
 		sessionManager.startSession("Long Break");
 		const session = sessionManager.getActiveSession();
 		expect(session?.durationMinutes).toBe(DEFAULT_SETTINGS.longBreakDuration);
+	});
+
+	it("should complete session when time runs out", () => {
+		sessionManager.startSession("Test", 1); // 1 minute
+		vi.advanceTimersByTime(60000 + 1000); // 1m + 1s to be safe
+		sessionManager.tick();
+
+		const session = sessionManager.getActiveSession();
+		expect(session?.status).toBe("completed");
+		// eslint-disable-next-line @typescript-eslint/unbound-method
+		expect(mockAudioService.playComplete).toHaveBeenCalledWith(true);
 	});
 });

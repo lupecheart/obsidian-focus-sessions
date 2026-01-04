@@ -20,6 +20,9 @@ export class AudioService {
 		return this.audioContext;
 	}
 
+	private activeOscillators: OscillatorNode[] = [];
+	private loopInterval: number | null = null;
+
 	private playTone(freq: number, type: OscillatorType, duration: number, startTime: number = 0) {
 		if (!this.enabled) return;
 		const ctx = this.getContext();
@@ -37,31 +40,63 @@ export class AudioService {
 
 		osc.start(ctx.currentTime + startTime);
 		osc.stop(ctx.currentTime + startTime + duration);
+
+		this.activeOscillators.push(osc);
+		osc.onended = () => {
+			this.activeOscillators = this.activeOscillators.filter((o) => o !== osc);
+		};
 	}
 
 	playStart() {
+		this.stopAlarm();
 		// Simple high ping
 		this.playTone(880, "sine", 0.5);
 	}
 
 	playPause() {
+		this.stopAlarm();
 		// Descending tone
 		this.playTone(440, "sine", 0.1);
 		this.playTone(330, "sine", 0.3, 0.1);
 	}
 
 	playResume() {
+		this.stopAlarm();
 		// Ascending tone
 		this.playTone(330, "sine", 0.1);
 		this.playTone(440, "sine", 0.3, 0.1);
 	}
 
-	playComplete() {
-		// Little melody: C - E - G - C
-		const now = 0;
-		this.playTone(523.25, "sine", 0.2, now);
-		this.playTone(659.25, "sine", 0.2, now + 0.2);
-		this.playTone(783.99, "sine", 0.2, now + 0.4);
-		this.playTone(1046.5, "sine", 0.6, now + 0.6);
+	playComplete(loop = false) {
+		this.stopAlarm();
+		const playMelody = () => {
+			// Little melody: C - E - G - C
+			const now = 0;
+			this.playTone(523.25, "sine", 0.2, now);
+			this.playTone(659.25, "sine", 0.2, now + 0.2);
+			this.playTone(783.99, "sine", 0.2, now + 0.4);
+			this.playTone(1046.5, "sine", 0.6, now + 0.6);
+		};
+
+		playMelody();
+
+		if (loop) {
+			this.loopInterval = window.setInterval(playMelody, 2000); // Repeat every 2s
+		}
+	}
+
+	stopAlarm() {
+		if (this.loopInterval) {
+			window.clearInterval(this.loopInterval);
+			this.loopInterval = null;
+		}
+		this.activeOscillators.forEach((osc) => {
+			try {
+				osc.stop();
+			} catch {
+				// Ignore if already stopped
+			}
+		});
+		this.activeOscillators = [];
 	}
 }
